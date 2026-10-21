@@ -53,7 +53,7 @@ for i, m in enumerate(NAMES):
         class_median_drive_m=d.groupby("cls").dist_m.median().round(1).to_dict(),
         per_sol_by_class=bysol.to_dict(orient="index"), driving_sols=len(ps),
         mean_m_per_driving_sol=round(ps.dist.mean(), 1), median_m_per_driving_sol=round(ps.dist.median(), 1),
-        by_bin=by.to_dict(orient="index"), corr_grade_vs_dist=round(d.grade_pct.corr(d.dist_m, method="spearman"), 3),
+        by_bin=by.to_dict(orient="index"), corr_grade_vs_dist=round(d.grade_pct.rank().corr(d.dist_m.rank()), 3),
         steepest_descents=d[d.dist_m >= 10].nsmallest(5, "grade_pct")[["sol", "to", "dist_m", "dz_m", "grade_pct"]].round(2).values.tolist(),
         steepest_climbs=d[d.dist_m >= 10].nlargest(5, "grade_pct")[["sol", "to", "dist_m", "dz_m", "grade_pct"]].round(2).values.tolist(),
         longest_downhill=dn.nlargest(5, "dist_m")[["sol", "to", "dist_m", "dz_m", "grade_pct"]].round(2).values.tolist(),
