@@ -15,10 +15,12 @@ jobs:
         with: {python-version: "3.12"}
       - name: Fetch new sols
         run: python -m marslog.fetch --backfill "${{ github.event.inputs.backfill || '10' }}" --refresh 4 --budget 1800
+      - name: Fetch traverse (MMGIS waypoints)
+        run: python -m marslog.traverse
       - name: Build changes + site
         run: python -m marslog.build && mkdir -p site/data && cp -r data/* site/data/ && touch site/.nojekyll
       - name: Study smoke test
-        run: pip install -q pandas matplotlib && python study/study.py
+        run: pip install -q pandas matplotlib && python study/study.py && pip install -q numpy && python study/traverse_study.py > /dev/null
       - name: Commit cache
         run: |
           git config user.name "marslog-bot"; git config user.email "actions@users.noreply.github.com"
