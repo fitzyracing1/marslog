@@ -11,6 +11,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Heat report (start sampling)
+        uses: fitzyracing1/heatgate@f766e4460f6468852c117c74dd83dfcf19cdb849  # heat-report-action (fitzyracing1/heatgate#2); switch to a tag once merged
+        continue-on-error: true
+        with: {mode: start, interval: "5"}
       - uses: actions/setup-python@v5
         with: {python-version: "3.12"}
       - name: Fetch new sols
@@ -29,6 +33,11 @@ jobs:
           git add data && (git diff --cached --quiet || (git commit -qm "data: $(date -u +%F)" && git push))
       - uses: actions/upload-pages-artifact@v3
         with: {path: site}
+      - name: Heat report (summary)
+        if: always()
+        uses: fitzyracing1/heatgate@f766e4460f6468852c117c74dd83dfcf19cdb849  # heat-report-action (fitzyracing1/heatgate#2); switch to a tag once merged
+        continue-on-error: true
+        with: {mode: stop, artifact: heat-report}
   deploy:
     needs: build
     runs-on: ubuntu-latest
