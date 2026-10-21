@@ -47,6 +47,30 @@ def changes(mission):
     return sols
 
 
+def traverse(mission):
+    """Per-sol traverse summary from data/traverse/{mission}.json (MMGIS end-of-drive waypoints)."""
+    p = os.path.join(DATA, "traverse", f"{mission}.json")
+    if not os.path.exists(p): return {}, []
+    pts = json.load(open(p))["points"]
+    out, prev = {}, None
+    for r in pts:
+        dz = round(r["elev_geoid"] - prev["elev_geoid"], 2) if prev and r["elev_geoid"] is not None and prev["elev_geoid"] is not None else None
+        dist = r["dist_m"] or 0
+        g = round(100 * dz / dist, 2) if dz is not None and dist >= 1 else None
+        d = dict(r, dz_m=dz, grade_pct=g, cls=None if g is None else "downhill" if g < -2 else "uphill" if g > 2 else "flat")
+        out.setdefault(r["sol"], []).append(d); prev = r
+    return out, [x for v in out.values() for x in v]
+
+
+def traverse_html(ws):
+    if not ws: return "<p>No rover localization (drive) reported for this sol in the public MMGIS traverse feed.</p>"
+    rows = "".join(f"<tr><td>{E(w['RMC'])}</td><td>{w['lat']:.6f}, {w['lon']:.6f}</td><td>{w['easting']:.1f} / {w['northing']}</td>"
+                   f"<td>{w['elev_geoid']:.1f}</td><td>{w['dist_m']}</td><td>{'' if w['dz_m'] is None else w['dz_m']}</td>"
+                   f"<td>{'' if w['grade_pct'] is None else w['grade_pct']} {w['cls'] or ''}</td><td>{w['tilt']}</td><td>{w['dist_total_m']}</td></tr>" for w in ws)
+    return ("<h2>Traverse</h2><table><tr><th>site_drive</th><th>lat, lon</th><th>easting / northing m</th><th>elev m</th>"
+            f"<th>drive m</th><th>&Delta;elev m</th><th>grade %</th><th>tilt&deg;</th><th>odometer m</th></tr>{rows}</table>")
+
+
 def fmt_d(v):
     if v is None: return ""
     return f"<span class={'up' if v > 0 else 'dn'}>{'+' if v > 0 else ''}{v}</span>" if v else "0"
@@ -54,6 +78,7 @@ def fmt_d(v):
 
 def main():
     os.makedirs(SITE, exist_ok=True)
+    trav_all = {}
     allsol, now = [], time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     csvw = csv.writer(gzip.open(os.path.join(DATA, "images.csv.gz"), "wt", newline="", compresslevel=9))
     hdr = ["mission", "sol", "id", "camera", "filter", "sample_type", "date_taken_utc", "date_taken_mars",
@@ -66,6 +91,7 @@ def main():
         ch = changes(m)
         json.dump(ch, open(os.path.join(DATA, m, "changes.json"), "w"), separators=(",", ":"))
         allsol += ch
+        tr, trav_all[m] = traverse(m)
         for c in ch:
             rows = "".join(f"<tr><td>{E(k)}</td><td>{v}</td><td>{fmt_d(c['camera_deltas'].get(k))}</td></tr>" for k, v in c["cameras"].items())
             w = c["weather"]
@@ -76,15 +102,19 @@ def main():
             lst = "".join(f"<li><a href='{E(i['link'] or '')}'>{E(i['id'])}</a> {E(i['camera'] or '')} <a href='{E(i['url_full'] or '')}'>img</a></li>" for i in imgs[:300])
             new = (f"<p><b>New instruments (first in cache):</b> {E(', '.join(c['new_instruments']))}</p>" if c["new_instruments"] else "")
             body = (f"<p>{c['count']} images &middot; first frame {E(c['first_date_utc'] or '')} UTC</p>{new}{wt}"
-                    f"<h2>Images per camera</h2><table><tr><th>camera</th><th>images</th><th>&Delta; vs prev sol</th></tr>{rows}</table>"
+                    f"{traverse_html(tr.get(c['sol']))}<h2>Images per camera</h2><table><tr><th>camera</th><th>images</th><th>&Delta; vs prev sol</th></tr>{rows}</table>"
                     f"<p>Raw: <a href='{BASE}data/{m}/{c['sol']}.json'>{m}/{c['sol']}.json</a></p>"
                     f"<h2>Images{' (first 300)' if len(imgs) > 300 else ''}</h2><ul>{lst}</ul>")
             os.makedirs(os.path.join(SITE, m), exist_ok=True)
             open(os.path.join(SITE, m, f"sol-{c['sol']}.html"), "w").write(page(f"{NAMES[m]} — Sol {c['sol']}", body))
+    json.dump({"generated": now, "source": {"mars2020": "https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json",
+               "msl": "https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/MSL_waypoints.json"},
+               "note": "End-of-drive localizations; elev_geoid m; dist_m = drive length; grade = dz/dist_m. No per-drive timing/speed in source.",
+               "missions": trav_all}, open(os.path.join(SITE, "traverse.json"), "w"), separators=(",", ":"))
     json.dump({"generated": now, "sols": allsol}, open(os.path.join(SITE, "data.json"), "w"))
     # index
     body = (f"<p>Daily cache of public NASA Mars rover raw-image metadata and weather, with a per-sol changelog. "
-            f"Updated {now}. <a href='{BASE}data.json'>data.json</a> &middot; <a href='{BASE}feed.xml'>Atom</a> &middot; "
+            f"Updated {now}. <a href='{BASE}data.json'>data.json</a> &middot; <a href='{BASE}traverse.json'>traverse.json</a> &middot; <a href='{BASE}feed.xml'>Atom</a> &middot; "
             f"<a href='{BASE}data/images.csv.gz'>images.csv.gz</a></p>")
     for m in NAMES:
         ch = [c for c in allsol if c["mission"] == m][::-1]

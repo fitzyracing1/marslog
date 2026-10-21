@@ -28,3 +28,10 @@ python -m marslog.build                 # changes + site
 pip install pandas matplotlib && python study/study.py   # study starter -> study/out/
 ```
 Deeper backfill: Actions → daily → Run workflow → `backfill` = e.g. 400 (time budget 30 min/run; rerun to continue).
+
+## Traverse / slope driving
+`python -m marslog.traverse` caches end-of-drive localizations (sol, lat/lon, easting/northing, geoid elevation, tilt, drive length, odometer) from NASA's public MMGIS feeds
+([M20_waypoints.json](https://mars.nasa.gov/mmgis-maps/M20/Layers/json/M20_waypoints.json), [MSL_waypoints.json](https://mars.nasa.gov/mmgis-maps/MSL/Layers/json/MSL_waypoints.json)) into `data/traverse/`, refreshed daily.
+Sol pages show a Traverse table; all points with per-drive Δelev/grade are in [`traverse.json`](https://fitzyracing1.github.io/marslog/traverse.json).
+`python study/traverse_study.py` computes per-drive grade, uphill/flat/downhill behaviour, extremes, and the REMS pressure-vs-altitude fit (charts in `study/charts/traverse/`).
+The feeds carry no per-drive timing, so speed is not available; distance per drive / per driving sol is used instead.
