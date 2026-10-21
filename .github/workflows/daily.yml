@@ -21,6 +21,8 @@ jobs:
         run: python -m marslog.build && mkdir -p site/data && cp -r data/* site/data/ && touch site/.nojekyll
       - name: Study smoke test
         run: pip install -q pandas matplotlib && python study/study.py && pip install -q numpy && python study/traverse_study.py > /dev/null
+      - name: Heat model (retrain + predict)
+        run: pip install -q scikit-learn pandas numpy && python -m marslog.heat train > /dev/null && python -m marslog.heat predict --sol 5100 && test -s site/heat.json
       - name: Commit cache
         run: |
           git config user.name "marslog-bot"; git config user.email "actions@users.noreply.github.com"

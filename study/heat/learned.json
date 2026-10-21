@@ -1,0 +1,635 @@
+{
+ "model_version": "heat-1.0",
+ "last_trained": "2026-10-21T22:04:44+00:00",
+ "data": {
+  "rows": 4745,
+  "sols": [
+   1,
+   4995
+  ],
+  "last_obs_sol": 4995,
+  "source": "NASA REMS (CAB outreach feed) + MMGIS traverse elevation"
+ },
+ "targets": {
+  "max_temp_c": {
+   "label": "daily max air temp",
+   "metrics": {
+    "test_sols": [
+     4024,
+     4995
+    ],
+    "n_train": 3773,
+    "n_test": 943,
+    "mae_persistence": 2.93,
+    "mae_climatology": 3.71,
+    "mae_linear_seasonal": 4.02,
+    "mae_gradient_boosting": 3.4
+   },
+   "interval90_residual_c": [
+    -5.32,
+    7.34
+   ],
+   "permutation_importance": [
+    {
+     "feature": "lag7_t",
+     "mae_increase_c": 2.66
+    },
+    {
+     "feature": "lag_t",
+     "mae_increase_c": 1.6
+    },
+    {
+     "feature": "cos1",
+     "mae_increase_c": 0.36
+    },
+    {
+     "feature": "sin1",
+     "mae_increase_c": 0.2
+    },
+    {
+     "feature": "ls",
+     "mae_increase_c": 0.11
+    },
+    {
+     "feature": "cos2",
+     "mae_increase_c": 0.01
+    },
+    {
+     "feature": "mars_year",
+     "mae_increase_c": 0.0
+    },
+    {
+     "feature": "elev_m",
+     "mae_increase_c": 0.0
+    },
+    {
+     "feature": "gap",
+     "mae_increase_c": 0.0
+    },
+    {
+     "feature": "sin2",
+     "mae_increase_c": -0.09
+    },
+    {
+     "feature": "lag_p",
+     "mae_increase_c": -0.12
+    }
+   ],
+   "seasonal_curve": [
+    {
+     "ls": 0,
+     "temp_c": -12.2
+    },
+    {
+     "ls": 30,
+     "temp_c": -20.3
+    },
+    {
+     "ls": 60,
+     "temp_c": -26.5
+    },
+    {
+     "ls": 90,
+     "temp_c": -26.5
+    },
+    {
+     "ls": 120,
+     "temp_c": -19.8
+    },
+    {
+     "ls": 150,
+     "temp_c": -10.4
+    },
+    {
+     "ls": 180,
+     "temp_c": -3.5
+    },
+    {
+     "ls": 210,
+     "temp_c": -1.5
+    },
+    {
+     "ls": 240,
+     "temp_c": -2.6
+    },
+    {
+     "ls": 270,
+     "temp_c": -3.8
+    },
+    {
+     "ls": 300,
+     "temp_c": -4.5
+    },
+    {
+     "ls": 330,
+     "temp_c": -6.6
+    }
+   ],
+   "seasonal_peak": {
+    "ls": 210,
+    "temp_c": -1.5
+   },
+   "seasonal_trough": {
+    "ls": 60,
+    "temp_c": -26.5
+   },
+   "altitude": {
+    "linear_c_per_100m": 0.07,
+    "elev_range_m": [
+     -4521,
+     -3500
+    ],
+    "gb_effect_p10_to_p90_c": -0.31,
+    "p10_p90_m": [
+     -4487,
+     -3673
+    ]
+   },
+   "mars_year_trend_c_per_year": 0.05,
+   "biggest_misses": [
+    {
+     "sol": 4774,
+     "date": "2026-01-10",
+     "actual_c": -59.0,
+     "pred_c": 0.3,
+     "err_c": -59.3
+    },
+    {
+     "sol": 4155,
+     "date": "2024-04-14",
+     "actual_c": -49.0,
+     "pred_c": -3.9,
+     "err_c": -45.1
+    },
+    {
+     "sol": 4198,
+     "date": "2024-05-28",
+     "actual_c": -38.0,
+     "pred_c": -2.3,
+     "err_c": -35.7
+    },
+    {
+     "sol": 4153,
+     "date": "2024-04-12",
+     "actual_c": -38.0,
+     "pred_c": -5.5,
+     "err_c": -32.5
+    },
+    {
+     "sol": 4111,
+     "date": "2024-02-29",
+     "actual_c": -35.0,
+     "pred_c": -2.8,
+     "err_c": -32.2
+    },
+    {
+     "sol": 4218,
+     "date": "2024-06-18",
+     "actual_c": -27.0,
+     "pred_c": -0.2,
+     "err_c": -26.8
+    },
+    {
+     "sol": 4110,
+     "date": "2024-02-28",
+     "actual_c": 7.0,
+     "pred_c": -6.4,
+     "err_c": 13.4
+    },
+    {
+     "sol": 4806,
+     "date": "2026-02-12",
+     "actual_c": -11.0,
+     "pred_c": 2.0,
+     "err_c": -13.0
+    }
+   ],
+   "anomalies_z_gt3": [
+    {
+     "sol": 4774,
+     "date": "2026-01-10",
+     "actual_c": -59.0,
+     "resid_c": -58.0,
+     "z": -11.6
+    },
+    {
+     "sol": 2814,
+     "date": "2020-07-06",
+     "actual_c": -53.0,
+     "resid_c": -50.8,
+     "z": -10.1
+    },
+    {
+     "sol": 3496,
+     "date": "2022-06-07",
+     "actual_c": -52.0,
+     "resid_c": -49.6,
+     "z": -9.9
+    },
+    {
+     "sol": 2965,
+     "date": "2020-12-08",
+     "actual_c": -54.0,
+     "resid_c": -47.8,
+     "z": -9.5
+    },
+    {
+     "sol": 4155,
+     "date": "2024-04-14",
+     "actual_c": -49.0,
+     "resid_c": -47.1,
+     "z": -9.4
+    },
+    {
+     "sol": 3260,
+     "date": "2021-10-07",
+     "actual_c": -67.0,
+     "resid_c": -44.2,
+     "z": -8.8
+    },
+    {
+     "sol": 4153,
+     "date": "2024-04-12",
+     "actual_c": -38.0,
+     "resid_c": -36.2,
+     "z": -7.2
+    },
+    {
+     "sol": 4198,
+     "date": "2024-05-28",
+     "actual_c": -38.0,
+     "resid_c": -34.8,
+     "z": -6.9
+    },
+    {
+     "sol": 4111,
+     "date": "2024-02-29",
+     "actual_c": -35.0,
+     "resid_c": -33.9,
+     "z": -6.8
+    },
+    {
+     "sol": 3441,
+     "date": "2022-04-11",
+     "actual_c": -31.0,
+     "resid_c": -29.7,
+     "z": -5.9
+    }
+   ],
+   "forecast": [
+    {
+     "sol": 4996,
+     "pred_c": -7.3,
+     "lo90_c": -12.6,
+     "hi90_c": 0.1
+    },
+    {
+     "sol": 4997,
+     "pred_c": -6.9,
+     "lo90_c": -12.2,
+     "hi90_c": 0.4
+    },
+    {
+     "sol": 4998,
+     "pred_c": -7.0,
+     "lo90_c": -12.3,
+     "hi90_c": 0.4
+    },
+    {
+     "sol": 4999,
+     "pred_c": -7.0,
+     "lo90_c": -12.3,
+     "hi90_c": 0.4
+    },
+    {
+     "sol": 5000,
+     "pred_c": -8.0,
+     "lo90_c": -13.3,
+     "hi90_c": -0.7
+    },
+    {
+     "sol": 5001,
+     "pred_c": -8.0,
+     "lo90_c": -13.3,
+     "hi90_c": -0.7
+    },
+    {
+     "sol": 5002,
+     "pred_c": -7.8,
+     "lo90_c": -13.1,
+     "hi90_c": -0.5
+    }
+   ]
+  },
+  "min_temp_c": {
+   "label": "daily min air temp",
+   "metrics": {
+    "test_sols": [
+     4024,
+     4995
+    ],
+    "n_train": 3773,
+    "n_test": 943,
+    "mae_persistence": 3.19,
+    "mae_climatology": 2.68,
+    "mae_linear_seasonal": 4.9,
+    "mae_gradient_boosting": 2.51
+   },
+   "interval90_residual_c": [
+    -5.28,
+    2.81
+   ],
+   "permutation_importance": [
+    {
+     "feature": "lag7_t",
+     "mae_increase_c": 0.95
+    },
+    {
+     "feature": "sin1",
+     "mae_increase_c": 0.78
+    },
+    {
+     "feature": "lag_t",
+     "mae_increase_c": 0.09
+    },
+    {
+     "feature": "ls",
+     "mae_increase_c": 0.07
+    },
+    {
+     "feature": "cos1",
+     "mae_increase_c": 0.03
+    },
+    {
+     "feature": "sin2",
+     "mae_increase_c": 0.03
+    },
+    {
+     "feature": "cos2",
+     "mae_increase_c": -0.0
+    },
+    {
+     "feature": "mars_year",
+     "mae_increase_c": 0.0
+    },
+    {
+     "feature": "elev_m",
+     "mae_increase_c": 0.0
+    },
+    {
+     "feature": "lag_p",
+     "mae_increase_c": -0.0
+    },
+    {
+     "feature": "gap",
+     "mae_increase_c": 0.0
+    }
+   ],
+   "seasonal_curve": [
+    {
+     "ls": 0,
+     "temp_c": -74.1
+    },
+    {
+     "ls": 30,
+     "temp_c": -77.5
+    },
+    {
+     "ls": 60,
+     "temp_c": -80.7
+    },
+    {
+     "ls": 90,
+     "temp_c": -81.7
+    },
+    {
+     "ls": 120,
+     "temp_c": -79.5
+    },
+    {
+     "ls": 150,
+     "temp_c": -75.2
+    },
+    {
+     "ls": 180,
+     "temp_c": -71.1
+    },
+    {
+     "ls": 210,
+     "temp_c": -69.0
+    },
+    {
+     "ls": 240,
+     "temp_c": -69.0
+    },
+    {
+     "ls": 270,
+     "temp_c": -70.0
+    },
+    {
+     "ls": 300,
+     "temp_c": -70.9
+    },
+    {
+     "ls": 330,
+     "temp_c": -71.9
+    }
+   ],
+   "seasonal_peak": {
+    "ls": 210,
+    "temp_c": -69.0
+   },
+   "seasonal_trough": {
+    "ls": 90,
+    "temp_c": -81.7
+   },
+   "altitude": {
+    "linear_c_per_100m": -0.4,
+    "elev_range_m": [
+     -4521,
+     -3500
+    ],
+    "gb_effect_p10_to_p90_c": -2.08,
+    "p10_p90_m": [
+     -4487,
+     -3673
+    ]
+   },
+   "mars_year_trend_c_per_year": 0.87,
+   "biggest_misses": [
+    {
+     "sol": 4780,
+     "date": "2026-01-16",
+     "actual_c": -98.0,
+     "pred_c": -63.7,
+     "err_c": -34.3
+    },
+    {
+     "sol": 4781,
+     "date": "2026-01-17",
+     "actual_c": -100.0,
+     "pred_c": -65.9,
+     "err_c": -34.1
+    },
+    {
+     "sol": 4844,
+     "date": "2026-03-23",
+     "actual_c": -100.0,
+     "pred_c": -66.7,
+     "err_c": -33.3
+    },
+    {
+     "sol": 4817,
+     "date": "2026-02-23",
+     "actual_c": -98.0,
+     "pred_c": -65.3,
+     "err_c": -32.7
+    },
+    {
+     "sol": 4823,
+     "date": "2026-03-01",
+     "actual_c": -99.0,
+     "pred_c": -66.3,
+     "err_c": -32.7
+    },
+    {
+     "sol": 4835,
+     "date": "2026-03-14",
+     "actual_c": -99.0,
+     "pred_c": -67.1,
+     "err_c": -31.9
+    },
+    {
+     "sol": 4792,
+     "date": "2026-01-28",
+     "actual_c": -100.0,
+     "pred_c": -68.3,
+     "err_c": -31.7
+    },
+    {
+     "sol": 4847,
+     "date": "2026-03-26",
+     "actual_c": -98.0,
+     "pred_c": -67.0,
+     "err_c": -31.0
+    }
+   ],
+   "anomalies_z_gt3": [
+    {
+     "sol": 4792,
+     "date": "2026-01-28",
+     "actual_c": -100.0,
+     "resid_c": -32.0,
+     "z": -8.7
+    },
+    {
+     "sol": 4781,
+     "date": "2026-01-17",
+     "actual_c": -100.0,
+     "resid_c": -31.8,
+     "z": -8.6
+    },
+    {
+     "sol": 4844,
+     "date": "2026-03-23",
+     "actual_c": -100.0,
+     "resid_c": -31.5,
+     "z": -8.6
+    },
+    {
+     "sol": 2803,
+     "date": "2020-06-25",
+     "actual_c": -100.0,
+     "resid_c": -31.4,
+     "z": -8.5
+    },
+    {
+     "sol": 4852,
+     "date": "2026-03-31",
+     "actual_c": -100.0,
+     "resid_c": -31.3,
+     "z": -8.5
+    },
+    {
+     "sol": 4808,
+     "date": "2026-02-14",
+     "actual_c": -99.0,
+     "resid_c": -31.0,
+     "z": -8.4
+    },
+    {
+     "sol": 4821,
+     "date": "2026-02-27",
+     "actual_c": -99.0,
+     "resid_c": -31.0,
+     "z": -8.4
+    },
+    {
+     "sol": 4823,
+     "date": "2026-03-01",
+     "actual_c": -99.0,
+     "resid_c": -30.9,
+     "z": -8.4
+    },
+    {
+     "sol": 4094,
+     "date": "2024-02-11",
+     "actual_c": -100.0,
+     "resid_c": -30.9,
+     "z": -8.4
+    },
+    {
+     "sol": 4835,
+     "date": "2026-03-14",
+     "actual_c": -99.0,
+     "resid_c": -30.7,
+     "z": -8.4
+    }
+   ],
+   "forecast": [
+    {
+     "sol": 4996,
+     "pred_c": -72.2,
+     "lo90_c": -77.5,
+     "hi90_c": -69.4
+    },
+    {
+     "sol": 4997,
+     "pred_c": -69.3,
+     "lo90_c": -74.6,
+     "hi90_c": -66.5
+    },
+    {
+     "sol": 4998,
+     "pred_c": -70.2,
+     "lo90_c": -75.5,
+     "hi90_c": -67.4
+    },
+    {
+     "sol": 4999,
+     "pred_c": -70.2,
+     "lo90_c": -75.5,
+     "hi90_c": -67.4
+    },
+    {
+     "sol": 5000,
+     "pred_c": -68.8,
+     "lo90_c": -74.1,
+     "hi90_c": -66.0
+    },
+    {
+     "sol": 5001,
+     "pred_c": -68.8,
+     "lo90_c": -74.1,
+     "hi90_c": -66.0
+    },
+    {
+     "sol": 5002,
+     "pred_c": -68.7,
+     "lo90_c": -74.0,
+     "hi90_c": -65.9
+    }
+   ]
+  }
+ }
+}

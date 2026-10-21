@@ -35,3 +35,15 @@ Deeper backfill: Actions → daily → Run workflow → `backfill` = e.g. 400 (t
 Sol pages show a Traverse table; all points with per-drive Δelev/grade are in [`traverse.json`](https://fitzyracing1.github.io/marslog/traverse.json).
 `python study/traverse_study.py` computes per-drive grade, uphill/flat/downhill behaviour, extremes, and the REMS pressure-vs-altitude fit (charts in `study/charts/traverse/`).
 The feeds carry no per-drive timing, so speed is not available; distance per drive / per driving sol is used instead.
+
+## Heat model
+A small ML model of Curiosity's daily **max/min air temperature** (REMS), retrained and re-predicted by the daily workflow.
+Features: Ls season (sin/cos, 2 harmonics), Mars year, traverse elevation interpolated by sol, last pressure, lagged temps (last obs, 7-obs mean, gap). Models: Ridge seasonal baseline + scikit-learn HistGradientBoosting, time-based split (last 20% of sols held out), MAE vs persistence/climatology.
+- Latest forecast: https://fitzyracing1.github.io/marslog/heat.json
+- Everything it learned: https://fitzyracing1.github.io/marslog/heat/learned.md (also `study/heat/learned.{md,json}`)
+```sh
+curl -s https://fitzyracing1.github.io/marslog/heat.json | python -m json.tool
+pip install scikit-learn pandas numpy
+python -m marslog.heat train            # retrain + write reports
+python -m marslog.heat predict --sol 5100
+```
