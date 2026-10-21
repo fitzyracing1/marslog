@@ -1,0 +1,30 @@
+# marslog
+
+A [knoblog](https://github.com/fitzyracing1/knoblog)-style changelog for Mars: a daily GitHub Actions job caches **public NASA rover metadata** (Perseverance + Curiosity raw images, plus weather) into this repo and publishes a per-sol changelog site, like [knobs-watch](https://github.com/fitzyracing1/knobs-watch).
+
+Site: https://fitzyracing1.github.io/marslog/ · [data.json](https://fitzyracing1.github.io/marslog/data.json) · [Atom](https://fitzyracing1.github.io/marslog/feed.xml) · [images.csv.gz](https://fitzyracing1.github.io/marslog/data/images.csv.gz)
+
+## Sources (public, no API key)
+| data | endpoint |
+|---|---|
+| Perseverance raw images | `https://mars.nasa.gov/rss/api/?feed=raw_images&category=mars2020&feedtype=json` (filter `condition_2=<sol>:sol:gte&condition_3=<sol>:sol:lte`, 100/page) |
+| Curiosity raw images | `https://mars.nasa.gov/api/v1/raw_image_items/?condition_1=msl:mission` (same sol conditions) |
+| Perseverance MEDA weather | `https://mars.nasa.gov/rss/api/?feed=weather&category=mars2020&feedtype=json` |
+| Curiosity REMS weather | `https://mars.nasa.gov/rss/api/?feed=weather&category=msl&feedtype=json` |
+
+Only metadata and URLs are stored (no image binaries). Images: NASA/JPL-Caltech. REMS weather is from CAB and intended for outreach; for science-grade data use [PDS](https://pds-atmospheres.nmsu.edu/). Weather feeds lag and have gaps.
+
+## Layout
+- `data/<mission>/<sol>.json` – every image (id, camera, filter, timestamps UTC/LMST, site/drive, mast az/el, URLs) + that sol's weather
+- `data/<mission>/weather.json` – full weather series
+- `data/<mission>/changes.json` – the changes layer: per-sol counts per camera, Δ vs previous sol, instruments new to the cache, weather deltas
+- `data/images.csv.gz` – combined flat dataset (all missions)
+- `site/` (built, not committed) – index, page per sol, `data.json`, `feed.xml`, `sitemap.xml`, `robots.txt`
+
+## Run
+```sh
+python -m marslog.fetch --backfill 30   # ensure last 30 sols cached; re-fetches last 3 (late downlinks)
+python -m marslog.build                 # changes + site
+pip install pandas matplotlib && python study/study.py   # study starter -> study/out/
+```
+Deeper backfill: Actions → daily → Run workflow → `backfill` = e.g. 400 (time budget 30 min/run; rerun to continue).
