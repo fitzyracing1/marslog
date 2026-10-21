@@ -1,0 +1,466 @@
+{
+ "protocol": "time-based split (last 20% of sols with an observation = test), 5-fold expanding-window walk-forward refit over the test period; features use only obs at sols <= s-h; climatology + hyper-params fit on training window only. MAE always scored against the raw (uncleaned) observations.",
+ "results": {
+  "max_temp_c|h1|raw": {
+   "test_sols": [
+    4023,
+    4995
+   ],
+   "n_test": 944,
+   "n_flagged": 0,
+   "models": {
+    "persistence": {
+     "mae": 2.931,
+     "n": 944
+    },
+    "seasonal_climatology": {
+     "mae": 3.64,
+     "n": 944
+    },
+    "clim_persistence_blend": {
+     "mae": 2.841,
+     "n": 944
+    },
+    "ridge_anomaly_lags": {
+     "mae": 2.654,
+     "n": 944
+    },
+    "hgb_anomaly_tuned": {
+     "mae": 2.632,
+     "n": 944
+    },
+    "lightgbm_anomaly_tuned": {
+     "mae": 2.639,
+     "n": 944
+    },
+    "sarimax_arma21_anomaly": {
+     "mae": 2.681,
+     "n": 944
+    },
+    "mlp_lag_window": {
+     "mae": 2.625,
+     "n": 944
+    },
+    "gru_lag_window": {
+     "mae": 2.504,
+     "n": 944
+    }
+   }
+  },
+  "max_temp_c|h7|raw": {
+   "test_sols": [
+    4023,
+    4995
+   ],
+   "n_test": 944,
+   "n_flagged": 0,
+   "models": {
+    "persistence": {
+     "mae": 4.138,
+     "n": 944
+    },
+    "seasonal_climatology": {
+     "mae": 3.641,
+     "n": 944
+    },
+    "clim_persistence_blend": {
+     "mae": 3.464,
+     "n": 944
+    },
+    "ridge_anomaly_lags": {
+     "mae": 3.201,
+     "n": 944
+    },
+    "hgb_anomaly_tuned": {
+     "mae": 3.42,
+     "n": 944
+    },
+    "lightgbm_anomaly_tuned": {
+     "mae": 3.441,
+     "n": 944
+    },
+    "sarimax_arma21_anomaly": {
+     "mae": 3.306,
+     "n": 944
+    },
+    "mlp_lag_window": {
+     "mae": 3.154,
+     "n": 944
+    },
+    "gru_lag_window": {
+     "mae": 3.133,
+     "n": 944
+    }
+   }
+  },
+  "max_temp_c|h1|clean": {
+   "test_sols": [
+    4023,
+    4995
+   ],
+   "n_test": 944,
+   "n_flagged": 35,
+   "models": {
+    "persistence": {
+     "mae": 2.702,
+     "n": 944
+    },
+    "seasonal_climatology": {
+     "mae": 3.571,
+     "n": 944
+    },
+    "clim_persistence_blend": {
+     "mae": 2.629,
+     "n": 944
+    },
+    "ridge_anomaly_lags": {
+     "mae": 2.508,
+     "n": 944
+    },
+    "hgb_anomaly_tuned": {
+     "mae": 2.505,
+     "n": 944
+    },
+    "lightgbm_anomaly_tuned": {
+     "mae": 2.539,
+     "n": 944
+    },
+    "sarimax_arma21_anomaly": {
+     "mae": 2.513,
+     "n": 944
+    },
+    "mlp_lag_window": {
+     "mae": 2.508,
+     "n": 944
+    },
+    "gru_lag_window": {
+     "mae": 2.485,
+     "n": 944
+    }
+   }
+  },
+  "max_temp_c|h7|clean": {
+   "test_sols": [
+    4023,
+    4995
+   ],
+   "n_test": 944,
+   "n_flagged": 35,
+   "models": {
+    "persistence": {
+     "mae": 3.614,
+     "n": 944
+    },
+    "seasonal_climatology": {
+     "mae": 3.573,
+     "n": 944
+    },
+    "clim_persistence_blend": {
+     "mae": 3.191,
+     "n": 944
+    },
+    "ridge_anomaly_lags": {
+     "mae": 3.057,
+     "n": 944
+    },
+    "hgb_anomaly_tuned": {
+     "mae": 3.163,
+     "n": 944
+    },
+    "lightgbm_anomaly_tuned": {
+     "mae": 3.212,
+     "n": 944
+    },
+    "sarimax_arma21_anomaly": {
+     "mae": 3.084,
+     "n": 944
+    },
+    "mlp_lag_window": {
+     "mae": 3.106,
+     "n": 944
+    },
+    "gru_lag_window": {
+     "mae": 3.077,
+     "n": 944
+    }
+   }
+  },
+  "min_temp_c|h1|raw": {
+   "test_sols": [
+    4023,
+    4995
+   ],
+   "n_test": 944,
+   "n_flagged": 0,
+   "models": {
+    "persistence": {
+     "mae": 3.189,
+     "n": 944
+    },
+    "seasonal_climatology": {
+     "mae": 2.614,
+     "n": 944
+    },
+    "clim_persistence_blend": {
+     "mae": 2.718,
+     "n": 944
+    },
+    "ridge_anomaly_lags": {
+     "mae": 2.615,
+     "n": 944
+    },
+    "hgb_anomaly_tuned": {
+     "mae": 2.795,
+     "n": 944
+    },
+    "lightgbm_anomaly_tuned": {
+     "mae": 2.677,
+     "n": 944
+    },
+    "sarimax_arma21_anomaly": {
+     "mae": 2.7,
+     "n": 944
+    },
+    "mlp_lag_window": {
+     "mae": 2.301,
+     "n": 944
+    },
+    "gru_lag_window": {
+     "mae": 2.22,
+     "n": 944
+    }
+   }
+  },
+  "min_temp_c|h7|raw": {
+   "test_sols": [
+    4023,
+    4995
+   ],
+   "n_test": 944,
+   "n_flagged": 0,
+   "models": {
+    "persistence": {
+     "mae": 3.52,
+     "n": 944
+    },
+    "seasonal_climatology": {
+     "mae": 2.616,
+     "n": 944
+    },
+    "clim_persistence_blend": {
+     "mae": 2.835,
+     "n": 944
+    },
+    "ridge_anomaly_lags": {
+     "mae": 2.648,
+     "n": 944
+    },
+    "hgb_anomaly_tuned": {
+     "mae": 3.133,
+     "n": 944
+    },
+    "lightgbm_anomaly_tuned": {
+     "mae": 3.058,
+     "n": 944
+    },
+    "sarimax_arma21_anomaly": {
+     "mae": 2.82,
+     "n": 944
+    },
+    "mlp_lag_window": {
+     "mae": 2.431,
+     "n": 944
+    },
+    "gru_lag_window": {
+     "mae": 2.383,
+     "n": 944
+    }
+   }
+  },
+  "min_temp_c|h1|clean": {
+   "test_sols": [
+    4023,
+    4995
+   ],
+   "n_test": 944,
+   "n_flagged": 62,
+   "models": {
+    "persistence": {
+     "mae": 2.305,
+     "n": 944
+    },
+    "seasonal_climatology": {
+     "mae": 2.575,
+     "n": 944
+    },
+    "clim_persistence_blend": {
+     "mae": 2.256,
+     "n": 944
+    },
+    "ridge_anomaly_lags": {
+     "mae": 2.137,
+     "n": 944
+    },
+    "hgb_anomaly_tuned": {
+     "mae": 2.165,
+     "n": 944
+    },
+    "lightgbm_anomaly_tuned": {
+     "mae": 2.151,
+     "n": 944
+    },
+    "sarimax_arma21_anomaly": {
+     "mae": 2.127,
+     "n": 944
+    },
+    "mlp_lag_window": {
+     "mae": 2.173,
+     "n": 944
+    },
+    "gru_lag_window": {
+     "mae": 2.166,
+     "n": 944
+    }
+   }
+  },
+  "min_temp_c|h7|clean": {
+   "test_sols": [
+    4023,
+    4995
+   ],
+   "n_test": 944,
+   "n_flagged": 62,
+   "models": {
+    "persistence": {
+     "mae": 2.534,
+     "n": 944
+    },
+    "seasonal_climatology": {
+     "mae": 2.577,
+     "n": 944
+    },
+    "clim_persistence_blend": {
+     "mae": 2.394,
+     "n": 944
+    },
+    "ridge_anomaly_lags": {
+     "mae": 2.283,
+     "n": 944
+    },
+    "hgb_anomaly_tuned": {
+     "mae": 2.331,
+     "n": 944
+    },
+    "lightgbm_anomaly_tuned": {
+     "mae": 2.297,
+     "n": 944
+    },
+    "sarimax_arma21_anomaly": {
+     "mae": 2.27,
+     "n": 944
+    },
+    "mlp_lag_window": {
+     "mae": 2.345,
+     "n": 944
+    },
+    "gru_lag_window": {
+     "mae": 2.333,
+     "n": 944
+    }
+   }
+  }
+ },
+ "generated": "2026-10-21T22:38:18+00:00",
+ "table": {
+  "persistence": {
+   "max_temp_c|h1|raw": 2.931,
+   "max_temp_c|h7|raw": 4.138,
+   "max_temp_c|h1|clean": 2.702,
+   "max_temp_c|h7|clean": 3.614,
+   "min_temp_c|h1|raw": 3.189,
+   "min_temp_c|h7|raw": 3.52,
+   "min_temp_c|h1|clean": 2.305,
+   "min_temp_c|h7|clean": 2.534
+  },
+  "seasonal_climatology": {
+   "max_temp_c|h1|raw": 3.64,
+   "max_temp_c|h7|raw": 3.641,
+   "max_temp_c|h1|clean": 3.571,
+   "max_temp_c|h7|clean": 3.573,
+   "min_temp_c|h1|raw": 2.614,
+   "min_temp_c|h7|raw": 2.616,
+   "min_temp_c|h1|clean": 2.575,
+   "min_temp_c|h7|clean": 2.577
+  },
+  "clim_persistence_blend": {
+   "max_temp_c|h1|raw": 2.841,
+   "max_temp_c|h7|raw": 3.464,
+   "max_temp_c|h1|clean": 2.629,
+   "max_temp_c|h7|clean": 3.191,
+   "min_temp_c|h1|raw": 2.718,
+   "min_temp_c|h7|raw": 2.835,
+   "min_temp_c|h1|clean": 2.256,
+   "min_temp_c|h7|clean": 2.394
+  },
+  "ridge_anomaly_lags": {
+   "max_temp_c|h1|raw": 2.654,
+   "max_temp_c|h7|raw": 3.201,
+   "max_temp_c|h1|clean": 2.508,
+   "max_temp_c|h7|clean": 3.057,
+   "min_temp_c|h1|raw": 2.615,
+   "min_temp_c|h7|raw": 2.648,
+   "min_temp_c|h1|clean": 2.137,
+   "min_temp_c|h7|clean": 2.283
+  },
+  "hgb_anomaly_tuned": {
+   "max_temp_c|h1|raw": 2.632,
+   "max_temp_c|h7|raw": 3.42,
+   "max_temp_c|h1|clean": 2.505,
+   "max_temp_c|h7|clean": 3.163,
+   "min_temp_c|h1|raw": 2.795,
+   "min_temp_c|h7|raw": 3.133,
+   "min_temp_c|h1|clean": 2.165,
+   "min_temp_c|h7|clean": 2.331
+  },
+  "lightgbm_anomaly_tuned": {
+   "max_temp_c|h1|raw": 2.639,
+   "max_temp_c|h7|raw": 3.441,
+   "max_temp_c|h1|clean": 2.539,
+   "max_temp_c|h7|clean": 3.212,
+   "min_temp_c|h1|raw": 2.677,
+   "min_temp_c|h7|raw": 3.058,
+   "min_temp_c|h1|clean": 2.151,
+   "min_temp_c|h7|clean": 2.297
+  },
+  "sarimax_arma21_anomaly": {
+   "max_temp_c|h1|raw": 2.681,
+   "max_temp_c|h7|raw": 3.306,
+   "max_temp_c|h1|clean": 2.513,
+   "max_temp_c|h7|clean": 3.084,
+   "min_temp_c|h1|raw": 2.7,
+   "min_temp_c|h7|raw": 2.82,
+   "min_temp_c|h1|clean": 2.127,
+   "min_temp_c|h7|clean": 2.27
+  },
+  "mlp_lag_window": {
+   "max_temp_c|h1|raw": 2.625,
+   "max_temp_c|h7|raw": 3.154,
+   "max_temp_c|h1|clean": 2.508,
+   "max_temp_c|h7|clean": 3.106,
+   "min_temp_c|h1|raw": 2.301,
+   "min_temp_c|h7|raw": 2.431,
+   "min_temp_c|h1|clean": 2.173,
+   "min_temp_c|h7|clean": 2.345
+  },
+  "gru_lag_window": {
+   "max_temp_c|h1|raw": 2.504,
+   "max_temp_c|h7|raw": 3.133,
+   "max_temp_c|h1|clean": 2.485,
+   "max_temp_c|h7|clean": 3.077,
+   "min_temp_c|h1|raw": 2.22,
+   "min_temp_c|h7|raw": 2.383,
+   "min_temp_c|h1|clean": 2.166,
+   "min_temp_c|h7|clean": 2.333
+  }
+ }
+}

@@ -11,7 +11,9 @@ from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.inspection import permutation_importance
 from sklearn.metrics import mean_absolute_error
 
-VERSION = "heat-1.0"
+VERSION = "heat-2.0"
+LIVE_MODEL = "ridge_anomaly_lags+robust_clean"  # bake-off winner (study/bakeoff/results.md)
+LEADERBOARD = "study/bakeoff/results.json"
 SOLS_PER_YEAR = 668.6
 TARGETS = {"max_temp_c": "daily max air temp", "min_temp_c": "daily min air temp"}
 LIN = ["sin1", "cos1", "sin2", "cos2", "mars_year", "elev_m"]
@@ -86,11 +88,63 @@ def future_row(w, d, target, sol, trav):
     return harm(pd.DataFrame([r]))
 
 
+def live_grid(w, tgt, extra):
+    from marslog.bakeoff import grid
+    g, _ = grid(w, tgt, cleaned=True)
+    last = int(g.sol.max())
+    if extra > 0:
+        fut = pd.DataFrame({"sol": np.arange(last + 1, last + extra + 1)})
+        fut["ls"] = [ls_of_sol(w, s) for s in fut.sol]
+        fut["elev_m"] = g.elev_m.iloc[-1]
+        g = pd.concat([g, fut], ignore_index=True)
+    return g
+
+
+def live_predict(w, tgt, sols):
+    """Direct multi-horizon Ridge on climatology anomalies (lags 1-7, rolling means, Ls harmonics, pressure),
+    inputs cleaned with a causal robust filter. Returns {sol: pred}. h = sol - last observation sol."""
+    from marslog.bakeoff import climatology, features, FEATS
+    last_obs = int(w.dropna(subset=[tgt]).sol.max())
+    g = live_grid(w, tgt, max(0, max(sols) - int(w.sol.max())))
+    clim = climatology(g, 10 ** 9)
+    out = {}
+    for h in sorted({max(1, s - last_obs) if s > last_obs else 1 for s in sols}):
+        X = features(g, clim, h)
+        tr = X[X.y_in.notna() & X.a_lag1.notna()]
+        mu = tr[FEATS].mean()
+        m = Ridge(alpha=1.0).fit(tr[FEATS].fillna(mu), tr.a_target)
+        for s in sols:
+            if (max(1, s - last_obs) if s > last_obs else 1) == h:
+                r = X[X.sol == s]
+                out[s] = float(r.clim.iloc[0] + m.predict(r[FEATS].fillna(mu))[0]) if len(r) else float("nan")
+    return out
+
+
+def live_metrics(w, tgt):
+    """Walk-forward MAE of the live model vs persistence (h=1..7) + residual quantiles for intervals."""
+    from marslog.bakeoff import evaluate, m_ridge, m_persistence
+    res = {}
+    for h in range(1, HORIZON + 1):
+        r = evaluate(w, tgt, h, True, models={"persistence": m_persistence, "live": m_ridge})
+        e = r["_y"] - r["_pred"]["live"]; e = e[~np.isnan(e)]
+        res[h] = {"mae_live": r["models"]["live"]["mae"], "mae_persistence_clean": r["models"]["persistence"]["mae"],
+                  "q90": [round(float(x), 2) for x in np.quantile(e, [0.05, 0.95])]}
+    return res
+
+
+def leaderboard(root="."):
+    try:
+        r = json.load(open(f"{root}/{LEADERBOARD}"))
+    except OSError:
+        return None
+    return {"protocol": r["protocol"], "generated": r.get("generated"), "mae_c": r["table"]}
+
+
 def learn(root="."):
     w, trav = load(root)
     out = {"model_version": VERSION, "last_trained": datetime.now(timezone.utc).isoformat(timespec="seconds"),
            "data": {"rows": len(w), "sols": [int(w.sol.min()), int(w.sol.max())], "last_obs_sol": int(w.dropna(subset=["max_temp_c"]).sol.max()),
-                    "source": "NASA REMS (CAB outreach feed) + MMGIS traverse elevation"}, "targets": {}}
+                    "source": "NASA REMS (CAB outreach feed) + MMGIS traverse elevation"}, "model": LIVE_MODEL, "leaderboard": leaderboard(root), "targets": {}}
     for tgt in TARGETS:
         d = frame(w, tgt)
         tr, te, lin, gb, pg, mets = fit(d, tgt)
@@ -114,12 +168,21 @@ def learn(root="."):
         r_all = d[tgt] - linA.predict(d[LIN]); z = (r_all - r_all.mean()) / r_all.std()
         anom = d.assign(resid=r_all, z=z)[np.abs(z) > 3].sort_values("z", key=abs, ascending=False).head(10)
         nxt = int(d.sol.max()) + 1
+        lm = live_metrics(w, tgt)
+        start = max(nxt, int(w.sol.max()) + 1)
+        sols = list(range(start, start + HORIZON))
+        lp = live_predict(w, tgt, sols)
         fc = []
-        for s in range(max(nxt, int(w.sol.max()) + 1), max(nxt, int(w.sol.max()) + 1) + HORIZON):
-            p = float(gbA.predict(future_row(w, d, tgt, s, trav)[GB])[0])
-            fc.append({"sol": s, "pred_c": round(p, 1), "lo90_c": round(p + q[0], 1), "hi90_c": round(p + q[1], 1)})
+        for s in sols:
+            h = min(HORIZON, max(1, s - (nxt - 1))); qq = lm[h]["q90"]; p = lp[s]
+            fc.append({"sol": s, "pred_c": round(p, 1), "lo90_c": round(p + qq[0], 1), "hi90_c": round(p + qq[1], 1)})
+        mets["mae_live_model_1sol"] = lm[1]["mae_live"]; mets["mae_live_model_7sol"] = lm[HORIZON]["mae_live"]
+        mets["mae_persistence_7sol"] = None
+        mets["walk_forward_by_horizon"] = {str(k): v for k, v in lm.items()}
+        q = np.array(lm[1]["q90"])
+        mets.pop("mae_persistence_7sol")
         out["targets"][tgt] = {
-            "label": TARGETS[tgt], "metrics": mets, "interval90_residual_c": [round(float(x), 2) for x in q],
+            "label": TARGETS[tgt], "model": LIVE_MODEL, "metrics": mets, "interval90_residual_c": [round(float(x), 2) for x in q],
             "permutation_importance": imp, "seasonal_curve": curve,
             "seasonal_peak": max(curve, key=lambda x: x["temp_c"]), "seasonal_trough": min(curve, key=lambda x: x["temp_c"]),
             "altitude": {"linear_c_per_100m": round(float(coef["elev_m"]) * 100, 2), "elev_range_m": [round(float(d.elev_m.min())), round(float(d.elev_m.max()))],
@@ -140,6 +203,7 @@ def md(o):
         m, a = r["metrics"], r["altitude"]
         L += [f"## {r['label']} (`{t}`)", "",
               f"**Accuracy (held-out sols {m['test_sols'][0]}–{m['test_sols'][1]}, n={m['n_test']}) – MAE °C:** "
+              f"**live model `{r['model']}` (walk-forward, raw obs) {m['mae_live_model_1sol']} at 1 sol, {m['mae_live_model_7sol']} at 7 sols**; legacy heat-1.0: "
               f"gradient boosting {m['mae_gradient_boosting']}, linear seasonal {m['mae_linear_seasonal']}, climatology {m['mae_climatology']}, persistence (yesterday) {m['mae_persistence']}.", "",
               f"- **Season:** warmest around Ls {r['seasonal_peak']['ls']}° ({r['seasonal_peak']['temp_c']} °C), coldest around Ls {r['seasonal_trough']['ls']}° ({r['seasonal_trough']['temp_c']} °C) — a swing of {round(r['seasonal_peak']['temp_c']-r['seasonal_trough']['temp_c'],1)} °C.",
               f"- **Altitude:** Curiosity climbed {a['elev_range_m'][0]} → {a['elev_range_m'][1]} m. Linear model: {a['linear_c_per_100m']} °C per 100 m; boosting: going from {a['p10_p90_m'][0]} to {a['p10_p90_m'][1]} m changes the prediction by {a['gb_effect_p10_to_p90_c']} °C (altitude is confounded with time/mission year).",
@@ -150,6 +214,13 @@ def md(o):
               "Biggest held-out misses: " + "; ".join(f"sol {b['sol']} ({b['date']}) actual {b['actual_c']} vs {b['pred_c']}" for b in r["biggest_misses"]), "",
               "Anomalies (|z|>3 vs seasonal model): " + ("; ".join(f"sol {b['sol']} ({b['date']}) {b['actual_c']} °C, z={b['z']}" for b in r["anomalies_z_gt3"]) or "none"), "",
               "Forecast: " + ", ".join(f"sol {f['sol']}: {f['pred_c']} [{f['lo90_c']}, {f['hi90_c']}]" for f in r["forecast"]), ""]
+    lb = o.get("leaderboard")
+    if lb:
+        L += ["## Model bake-off (leaderboard, MAE °C)", "", lb["protocol"], "",
+              "| model | max 1-sol | max 7-sol | min 1-sol | min 7-sol | max 1-sol clean | max 7-sol clean | min 1-sol clean | min 7-sol clean |", "|---|---|---|---|---|---|---|---|---|"]
+        for name, v in lb["mae_c"].items():
+            L.append(f"| {name} | " + " | ".join(str(v.get(k, "")) for k in ["max_temp_c|h1|raw", "max_temp_c|h7|raw", "min_temp_c|h1|raw", "min_temp_c|h7|raw", "max_temp_c|h1|clean", "max_temp_c|h7|clean", "min_temp_c|h1|clean", "min_temp_c|h7|clean"]) + " |")
+        L.append("")
     L += ["## Caveats", "REMS outreach data (CAB) is rounded, has gaps and some suspect values; not science-grade (use PDS). "
           "Elevation is interpolated between MMGIS waypoints. Forecast Ls for future sols is copied from one Mars year earlier; "
           "lag features for future sols use the last observation, so uncertainty grows with gap."]
@@ -166,19 +237,18 @@ def main(argv=None):
         text = md(o)
         for f in ["study/heat/learned.md", "site/heat/learned.md"]: open(f, "w").write(text)
         json.dump(o, open("study/heat/learned.json", "w"), indent=1)
-        pub = {k: o[k] for k in ["model_version", "last_trained", "data"]}
-        pub["predictions"] = {t: {"next_sols": r["forecast"], "metrics": r["metrics"], "interval90_residual_c": r["interval90_residual_c"]} for t, r in o["targets"].items()}
+        pub = {k: o[k] for k in ["model_version", "last_trained", "data", "model", "leaderboard"]}
+        pub["predictions"] = {t: {"model": r["model"], "next_sols": r["forecast"], "metrics": r["metrics"], "interval90_residual_c": r["interval90_residual_c"]} for t, r in o["targets"].items()}
         pub["learned"] = "https://fitzyracing1.github.io/marslog/heat/learned.md"
         json.dump(pub, open("site/heat.json", "w"), indent=1)
         print(text)
     else:
-        res = {"sol": a.sol, "model_version": o["model_version"], "ls": round(ls_of_sol(w, a.sol), 1)}
+        res = {"sol": a.sol, "model_version": o["model_version"], "model": LIVE_MODEL, "ls": round(ls_of_sol(w, a.sol), 1)}
         obs = w[w.sol == a.sol]
         for t, r in o["targets"].items():
-            d = frame(w, t)
-            gbA = HistGradientBoostingRegressor(max_iter=300, learning_rate=0.05, random_state=0).fit(d[GB], d[t])
-            row = d[d.sol == a.sol][GB] if (d.sol == a.sol).any() else future_row(w, d, t, a.sol, trav)[GB]
-            p = float(gbA.predict(row)[0]); q = r["interval90_residual_c"]
+            p = live_predict(w, t, [a.sol])[a.sol]
+            last = int(w.dropna(subset=[t]).sol.max()); h = min(HORIZON, max(1, a.sol - last))
+            q = r["metrics"]["walk_forward_by_horizon"][str(h)]["q90"]
             res[t] = {"pred_c": round(p, 1), "lo90_c": round(p + q[0], 1), "hi90_c": round(p + q[1], 1),
                       "observed_c": None if obs.empty or pd.isna(obs[t].iloc[0]) else float(obs[t].iloc[0])}
         print(json.dumps(res, indent=1))
